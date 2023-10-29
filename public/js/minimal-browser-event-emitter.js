@@ -1,0 +1,2 @@
+var e={d:(t,n)=>{for(var r in n)e.o(n,r)&&!e.o(t,r)&&Object.defineProperty(t,r,{enumerable:!0,get:n[r]})},o:(e,t)=>Object.prototype.hasOwnProperty.call(e,t)},t={};e.d(t,{Z:()=>n});class n extends EventTarget{on(e,t){let n=e=>{t.apply(this,e.detail)};t.nativeListener=n,this.addEventListener(e,n)}emit(e,...t){this.dispatchEvent(new CustomEvent(e,{detail:t}))}removeListener(e,t){t=t.nativeListener||t,this.removeEventListener(e,t)}}var r=t.Z;export{r as default};
+//# sourceMappingURL=minimal-browser-event-emitter.js.map
