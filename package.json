@@ -1,6 +1,6 @@
 {
 	"name": "@webhandle/minimal-browser-event-emitter",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "The smallest possible node js style event emitter methods over browser event dispatcher code",
 	"main": "client-js/index.js",
 	"scripts": {
@@ -24,7 +24,6 @@
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
-		"webhandle-js-widget-setup": "^1.0.5",
 		"browserify": "^14.4.0",
 		"chai": "^4.3.4",
 		"exorcist": "^2.0.0",
@@ -41,9 +40,11 @@
 		"tripartite": "^1.1.1",
 		"uglify-js": "^3.17.4",
 		"webhandle": "^1.0.32",
+		"webhandle-js-widget-setup": "^1.0.5",
 		"webpack-cli": "^5.1.4"
 	},
-	"dependencies": {},
+	"dependencies": {
+	},
 	"browserify": {
 		"transform": [
 			"tripartite/browserify-transform"

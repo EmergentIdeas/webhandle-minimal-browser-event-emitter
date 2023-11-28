@@ -20,6 +20,7 @@ export default class EventEmitter extends EventTarget {
 		}
 		listener.nativeListener = nativeListener
 		this.addEventListener(eventName, nativeListener)
+		return this
 	}
 
 	/**
@@ -33,6 +34,7 @@ export default class EventEmitter extends EventTarget {
 		this.dispatchEvent(new CustomEvent(eventName, {
 			detail: args
 		}))
+		return this
 	}
 
 	/**
@@ -43,6 +45,6 @@ export default class EventEmitter extends EventTarget {
 	removeListener(eventName, listener) {
 		listener = listener.nativeListener || listener
 		this.removeEventListener(eventName, listener)
+		return this
 	}
-
 }

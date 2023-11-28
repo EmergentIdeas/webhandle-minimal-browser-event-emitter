@@ -7,13 +7,24 @@ mocha.setup('bdd')
 mocha.run()
 
 
-describe("view operations", function () {
+describe("event basics", function () {
 	it("basic emission", function (done) {
 		let emitter = new EventEmitter()
 
 		emitter.on('test', function (one, two, three) {
 			console.log(this)
 			done()
+		})
+
+		emitter.emit('test')
+	})
+	it("chained calls", function (done) {
+		let emitter = new EventEmitter()
+
+		emitter.on('test', function (one, two, three) {
+			done()
+		})
+		.on('test', function (one, two, three) {
 		})
 
 		emitter.emit('test')

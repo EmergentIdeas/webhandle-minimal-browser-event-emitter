@@ -36070,6 +36070,7 @@ class EventEmitter extends EventTarget {
 		}
 		listener.nativeListener = nativeListener
 		this.addEventListener(eventName, nativeListener)
+		return this
 	}
 
 	/**
@@ -36083,6 +36084,7 @@ class EventEmitter extends EventTarget {
 		this.dispatchEvent(new CustomEvent(eventName, {
 			detail: args
 		}))
+		return this
 	}
 
 	/**
@@ -36093,8 +36095,8 @@ class EventEmitter extends EventTarget {
 	removeListener(eventName, listener) {
 		listener = listener.nativeListener || listener
 		this.removeEventListener(eventName, listener)
+		return this
 	}
-
 }
 
 /***/ }),
@@ -36258,13 +36260,24 @@ mocha.setup('bdd')
 mocha.run()
 
 
-describe("view operations", function () {
+describe("event basics", function () {
 	it("basic emission", function (done) {
 		let emitter = new _client_js_index_js__WEBPACK_IMPORTED_MODULE_0__["default"]()
 
 		emitter.on('test', function (one, two, three) {
 			console.log(this)
 			done()
+		})
+
+		emitter.emit('test')
+	})
+	it("chained calls", function (done) {
+		let emitter = new _client_js_index_js__WEBPACK_IMPORTED_MODULE_0__["default"]()
+
+		emitter.on('test', function (one, two, three) {
+			done()
+		})
+		.on('test', function (one, two, three) {
 		})
 
 		emitter.emit('test')
