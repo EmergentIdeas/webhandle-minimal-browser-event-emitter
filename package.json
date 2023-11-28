@@ -1,6 +1,6 @@
 {
 	"name": "@webhandle/minimal-browser-event-emitter",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "The smallest possible node js style event emitter methods over browser event dispatcher code",
 	"main": "client-js/index.js",
 	"scripts": {
@@ -52,6 +52,8 @@
 	},
 	"files": [
 		"/client-js/index.js",
+		"/client-js/event-emitter.mjs",
+		"/client-js/streamish.mjs",
 		"/public/js/minimal-browser-event-emitter*",
 		"README.md"
 	],

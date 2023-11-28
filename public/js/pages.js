@@ -36038,16 +36038,17 @@ module.exports = { nanoid, customAlphabet }
 
 /***/ }),
 
-/***/ "./client-js/index.js":
-/*!****************************!*\
-  !*** ./client-js/index.js ***!
-  \****************************/
+/***/ "./client-js/event-emitter.mjs":
+/*!*************************************!*\
+  !*** ./client-js/event-emitter.mjs ***!
+  \*************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ EventEmitter)
 /* harmony export */ });
+
 /**
  * Add this most basic of the EventEmitter functions (on, emit, removeListener) to the browser's
  * EventTarget functionality.
@@ -36056,7 +36057,17 @@ __webpack_require__.r(__webpack_exports__);
  * functions. Keep in mind that when an ordinary listener function is called, the standard this 
  * keyword is intentionally set to reference the EventEmitter instance to which the listener is attached.
  */
-class EventEmitter extends EventTarget {
+let base = typeof EventTarget === 'undefined' ? {} : EventTarget
+class EventEmitter extends base {
+	constructor(target) {
+		super(target)
+		if(target) {
+			this.innerEventTarget = target
+		}
+		else {
+			this.innerEventTarget = this
+		}
+	}
 	/**
 	 * Adds the listener function to the end of the listeners array for the event named eventName. No checks 
 	 * are made to see if the listener has already been added. Multiple calls passing the same combination 
@@ -36069,7 +36080,7 @@ class EventEmitter extends EventTarget {
 			listener.apply(this, event.detail)
 		}
 		listener.nativeListener = nativeListener
-		this.addEventListener(eventName, nativeListener)
+		this.innerEventTarget.addEventListener(eventName, nativeListener)
 		return this
 	}
 
@@ -36081,7 +36092,7 @@ class EventEmitter extends EventTarget {
 	 * @param  {...any} args 
 	 */
 	emit(eventName, ...args) {
-		this.dispatchEvent(new CustomEvent(eventName, {
+		this.innerEventTarget.dispatchEvent(new CustomEvent(eventName, {
 			detail: args
 		}))
 		return this
@@ -36094,8 +36105,85 @@ class EventEmitter extends EventTarget {
 	 */
 	removeListener(eventName, listener) {
 		listener = listener.nativeListener || listener
-		this.removeEventListener(eventName, listener)
+		this.innerEventTarget.removeEventListener(eventName, listener)
 		return this
+	}
+}
+
+/***/ }),
+
+/***/ "./client-js/index.js":
+/*!****************************!*\
+  !*** ./client-js/index.js ***!
+  \****************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _streamish_mjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./streamish.mjs */ "./client-js/streamish.mjs");
+/* harmony import */ var _event_emitter_mjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./event-emitter.mjs */ "./client-js/event-emitter.mjs");
+let Emitter
+;
+
+
+if (typeof EventTarget !== 'undefined') {
+	Emitter = _event_emitter_mjs__WEBPACK_IMPORTED_MODULE_1__["default"]
+}
+else {
+	Emitter = _streamish_mjs__WEBPACK_IMPORTED_MODULE_0__["default"]
+}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Emitter);
+
+/***/ }),
+
+/***/ "./client-js/streamish.mjs":
+/*!*********************************!*\
+  !*** ./client-js/streamish.mjs ***!
+  \*********************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Streamish)
+/* harmony export */ });
+
+class Streamish {
+	constructor() {
+		this.handles = {}
+	}
+
+	on(evt, handle) {
+		let handles = this.handles[evt]
+		if (!handles) {
+			handles = this.handles[evt] = []
+		}
+		handles.push(handle)
+		return this
+	}
+
+	emit(evt, ...args) {
+		if (evt in this.handles) {
+			for (let handle of this.handles[evt]) {
+				handle.apply(this, args)
+			}
+		}
+	}
+
+	/**
+	 * Removes the specified listener from the listener array for the event named eventName.
+	 * @param {string} eventName The event type name
+	 * @param {function} listener The listener function
+	 */
+	removeListener(eventName, listener) {
+		if (eventName in this.handles) {
+			this.handles[eventName] = this.handles[eventName].filter(func => {
+				return func !== listener
+			})
+		}
 	}
 }
 

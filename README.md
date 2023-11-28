@@ -2,6 +2,8 @@
 
 The smallest possible node js style event emitter methods over browser event dispatcher code
 
+There's an additional class `Streamish` which doesn't rely on anything.
+
 
 ## Install 
 
