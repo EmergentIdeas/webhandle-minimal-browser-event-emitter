@@ -42,9 +42,7 @@ export default class EventEmitter extends base {
 	 * @param  {...any} args 
 	 */
 	emit(eventName, ...args) {
-		this.innerEventTarget.dispatchEvent(new CustomEvent(eventName, {
-			detail: args
-		}))
+		this.innerEventTarget.dispatchEvent(this._makeEvent(eventName, args))
 		return this
 	}
 
@@ -57,5 +55,18 @@ export default class EventEmitter extends base {
 		listener = listener.nativeListener || listener
 		this.innerEventTarget.removeEventListener(eventName, listener)
 		return this
+	}
+	
+	_makeEvent(eventName, args) {
+		if(typeof CustomEvent === 'function') {
+			return new CustomEvent(eventName, {
+				detail: args
+			})
+		}
+		else {
+			let evt = new Event(eventName)
+			evt.detail = args
+			return evt
+		}
 	}
 }

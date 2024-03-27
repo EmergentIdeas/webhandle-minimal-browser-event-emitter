@@ -36092,9 +36092,7 @@ class EventEmitter extends base {
 	 * @param  {...any} args 
 	 */
 	emit(eventName, ...args) {
-		this.innerEventTarget.dispatchEvent(new CustomEvent(eventName, {
-			detail: args
-		}))
+		this.innerEventTarget.dispatchEvent(this._makeEvent(eventName, args))
 		return this
 	}
 
@@ -36107,6 +36105,19 @@ class EventEmitter extends base {
 		listener = listener.nativeListener || listener
 		this.innerEventTarget.removeEventListener(eventName, listener)
 		return this
+	}
+	
+	_makeEvent(eventName, args) {
+		if(typeof CustomEvent === 'function') {
+			return new CustomEvent(eventName, {
+				detail: args
+			})
+		}
+		else {
+			let evt = new Event(eventName)
+			evt.detail = args
+			return evt
+		}
 	}
 }
 
@@ -36228,6 +36239,155 @@ const core = _index_js__WEBPACK_IMPORTED_MODULE_0__.core;
 
 /***/ }),
 
+/***/ "./utils/basic-test-methods.mjs":
+/*!**************************************!*\
+  !*** ./utils/basic-test-methods.mjs ***!
+  \**************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ basicTestMethods)
+/* harmony export */ });
+/* harmony import */ var _client_js_event_emitter_mjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../client-js/event-emitter.mjs */ "./client-js/event-emitter.mjs");
+/* harmony import */ var chai__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! chai */ "./node_modules/chai/index.mjs");
+
+
+
+function basicTestMethods() {
+	describe("event basics", function () {
+		it("basic emission", function (done) {
+			let emitter = new _client_js_event_emitter_mjs__WEBPACK_IMPORTED_MODULE_0__["default"]()
+
+			emitter.on('test', function (one, two, three) {
+				done()
+			})
+
+			emitter.emit('test')
+		})
+		it("chained calls", function (done) {
+			let emitter = new _client_js_event_emitter_mjs__WEBPACK_IMPORTED_MODULE_0__["default"]()
+
+			emitter.on('test', function (one, two, three) {
+				done()
+			})
+				.on('test', function (one, two, three) {
+				})
+
+			emitter.emit('test')
+		})
+
+		it("emission parameters", function (done) {
+			let emitter = new _client_js_event_emitter_mjs__WEBPACK_IMPORTED_MODULE_0__["default"]()
+
+			emitter.on('test', (one, two, three) => {
+				chai__WEBPACK_IMPORTED_MODULE_1__.assert.equal(one, 1)
+				chai__WEBPACK_IMPORTED_MODULE_1__.assert.equal(two, 2)
+				chai__WEBPACK_IMPORTED_MODULE_1__.assert.equal(three, 3)
+				done()
+			})
+
+			emitter.emit('test', 1, 2, 3)
+		})
+
+		it("wrong event type emission", function (done) {
+			let emitter = new _client_js_event_emitter_mjs__WEBPACK_IMPORTED_MODULE_0__["default"]()
+
+			emitter.on('test', (one, two, three) => {
+				done(new Error())
+			})
+
+			emitter.emit('test2')
+			setTimeout(function () {
+				done()
+			}, 200)
+		})
+
+		it("remove listener", function (done) {
+			let emitter = new _client_js_event_emitter_mjs__WEBPACK_IMPORTED_MODULE_0__["default"]()
+
+			let listener = (one, two, three) => {
+				done(new Error())
+			}
+			emitter.on('test', listener)
+			emitter.removeListener('test', listener)
+
+			emitter.emit('test')
+			setTimeout(function () {
+				done()
+			}, 200)
+		})
+		it("remove CustomEvent", function () {
+			if(typeof window !== 'undefined') {
+				delete window.CustomEvent
+			}
+		})
+		it("basic emission plain event", function (done) {
+			let emitter = new _client_js_event_emitter_mjs__WEBPACK_IMPORTED_MODULE_0__["default"]()
+
+			emitter.on('test', function (one, two, three) {
+				done()
+			})
+
+			emitter.emit('test')
+		})
+		it("chained calls plain event", function (done) {
+			let emitter = new _client_js_event_emitter_mjs__WEBPACK_IMPORTED_MODULE_0__["default"]()
+
+			emitter.on('test', function (one, two, three) {
+				done()
+			})
+				.on('test', function (one, two, three) {
+				})
+
+			emitter.emit('test')
+		})
+
+		it("emission parameters plain event", function (done) {
+			let emitter = new _client_js_event_emitter_mjs__WEBPACK_IMPORTED_MODULE_0__["default"]()
+
+			emitter.on('test', (one, two, three) => {
+				chai__WEBPACK_IMPORTED_MODULE_1__.assert.equal(one, 1)
+				chai__WEBPACK_IMPORTED_MODULE_1__.assert.equal(two, 2)
+				chai__WEBPACK_IMPORTED_MODULE_1__.assert.equal(three, 3)
+				done()
+			})
+
+			emitter.emit('test', 1, 2, 3)
+		})
+
+		it("wrong event type emission plain event", function (done) {
+			let emitter = new _client_js_event_emitter_mjs__WEBPACK_IMPORTED_MODULE_0__["default"]()
+
+			emitter.on('test', (one, two, three) => {
+				done(new Error())
+			})
+
+			emitter.emit('test2')
+			setTimeout(function () {
+				done()
+			}, 200)
+		})
+
+		it("remove listener plain event", function (done) {
+			let emitter = new _client_js_event_emitter_mjs__WEBPACK_IMPORTED_MODULE_0__["default"]()
+
+			let listener = (one, two, three) => {
+				done(new Error())
+			}
+			emitter.on('test', listener)
+			emitter.removeListener('test', listener)
+
+			emitter.emit('test')
+			setTimeout(function () {
+				done()
+			}, 200)
+		})
+	})
+}
+
+/***/ }),
+
 /***/ "./node_modules/mocha/lib/mocharc.json":
 /*!*********************************************!*\
   !*** ./node_modules/mocha/lib/mocharc.json ***!
@@ -36338,7 +36498,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _client_js_index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../client-js/index.js */ "./client-js/index.js");
 /* harmony import */ var mocha__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! mocha */ "./node_modules/mocha/browser-entry.js");
 /* harmony import */ var chai__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! chai */ "./node_modules/chai/index.mjs");
-/* provided dependency */ var console = __webpack_require__(/*! ./node_modules/console-browserify/index.js */ "./node_modules/console-browserify/index.js");
+/* harmony import */ var _utils_basic_test_methods_mjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/basic-test-methods.mjs */ "./utils/basic-test-methods.mjs");
+
 
 
 
@@ -36347,72 +36508,7 @@ __webpack_require__.r(__webpack_exports__);
 mocha.setup('bdd')
 mocha.run()
 
-
-describe("event basics", function () {
-	it("basic emission", function (done) {
-		let emitter = new _client_js_index_js__WEBPACK_IMPORTED_MODULE_0__["default"]()
-
-		emitter.on('test', function (one, two, three) {
-			console.log(this)
-			done()
-		})
-
-		emitter.emit('test')
-	})
-	it("chained calls", function (done) {
-		let emitter = new _client_js_index_js__WEBPACK_IMPORTED_MODULE_0__["default"]()
-
-		emitter.on('test', function (one, two, three) {
-			done()
-		})
-		.on('test', function (one, two, three) {
-		})
-
-		emitter.emit('test')
-	})
-
-	it("emission parameters", function (done) {
-		let emitter = new _client_js_index_js__WEBPACK_IMPORTED_MODULE_0__["default"]()
-
-		emitter.on('test', (one, two, three) => {
-			chai__WEBPACK_IMPORTED_MODULE_2__.assert.equal(one, 1)
-			chai__WEBPACK_IMPORTED_MODULE_2__.assert.equal(two, 2)
-			chai__WEBPACK_IMPORTED_MODULE_2__.assert.equal(three, 3)
-			done()
-		})
-
-		emitter.emit('test', 1, 2, 3)
-	})
-
-	it("wrong event type emission", function (done) {
-		let emitter = new _client_js_index_js__WEBPACK_IMPORTED_MODULE_0__["default"]()
-
-		emitter.on('test', (one, two, three) => {
-			done(new Error())
-		})
-
-		emitter.emit('test2')
-		setTimeout(function() {
-			done()
-		}, 200)
-	})
-
-	it("remove listener", function (done) {
-		let emitter = new _client_js_index_js__WEBPACK_IMPORTED_MODULE_0__["default"]()
-
-		let listener = (one, two, three) => {
-			done(new Error())
-		}
-		emitter.on('test', listener)
-		emitter.removeListener('test', listener)
-
-		emitter.emit('test')
-		setTimeout(function() {
-			done()
-		}, 200)
-	})
-})
-
+;(0,_utils_basic_test_methods_mjs__WEBPACK_IMPORTED_MODULE_3__["default"])()
 
 })();
 
