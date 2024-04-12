@@ -1,3 +1,4 @@
+import Streamish from "./streamish.mjs"
 
 /**
  * Add this most basic of the EventEmitter functions (on, emit, removeListener) to the browser's
@@ -7,7 +8,7 @@
  * functions. Keep in mind that when an ordinary listener function is called, the standard this 
  * keyword is intentionally set to reference the EventEmitter instance to which the listener is attached.
  */
-let base = typeof EventTarget === 'undefined' ? {} : EventTarget
+let base = typeof EventTarget === 'undefined' ? Streamish : EventTarget
 export default class EventEmitter extends base {
 	constructor(target) {
 		super(target)
@@ -26,11 +27,16 @@ export default class EventEmitter extends base {
 	 * @param {*} listener The listener function where has arbitrary arguments
 	 */
 	on(eventName, listener) {
-		let nativeListener = (event) => {
-			listener.apply(this, event.detail)
+		if(this.innerEventTarget.addEventListener) {
+			let nativeListener = (event) => {
+				listener.apply(this, event.detail)
+			}
+			listener.nativeListener = nativeListener
+			this.innerEventTarget.addEventListener(eventName, nativeListener)
 		}
-		listener.nativeListener = nativeListener
-		this.innerEventTarget.addEventListener(eventName, nativeListener)
+		else {
+			super.on(eventName, listener)
+		}
 		return this
 	}
 
@@ -42,7 +48,12 @@ export default class EventEmitter extends base {
 	 * @param  {...any} args 
 	 */
 	emit(eventName, ...args) {
-		this.innerEventTarget.dispatchEvent(this._makeEvent(eventName, args))
+		if(this.innerEventTarget.dispatchEvent) {
+			this.innerEventTarget.dispatchEvent(this._makeEvent(eventName, args))
+		}
+		else {
+			super.emit(eventName, ...args)
+		}
 		return this
 	}
 
@@ -52,8 +63,13 @@ export default class EventEmitter extends base {
 	 * @param {function} listener The listener function
 	 */
 	removeListener(eventName, listener) {
-		listener = listener.nativeListener || listener
-		this.innerEventTarget.removeEventListener(eventName, listener)
+		if(this.innerEventTarget.removeEventListener) {
+			listener = listener.nativeListener || listener
+			this.innerEventTarget.removeEventListener(eventName, listener)
+		}
+		else {
+			super.removeListener(eventName, listener)
+		}
 		return this
 	}
 	
